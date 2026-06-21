@@ -1,19 +1,30 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase";
 import CestaItem from "@/components/CestaItem";
-import { generarLinkWhatsApp } from "@/lib/whatsapp";
 
 type CestaRow = {
   id: string;
   comentario_ia: string | null;
+  comprado: boolean;
   products: {
     nombre: string;
     emoji: string;
   } | null;
 };
+
+const NUMERO_JAVI = "34669558210";
+const NUMERO_VANE = "34626248847";
+const URL_CESTA = "https://lista9.vercel.app/cesta";
+
+function generarLinkSimple(destinatario: "javi" | "vane"): string {
+  const numero = destinatario === "javi" ? NUMERO_JAVI : NUMERO_VANE;
+  const mensaje = `Senior Rex te manda la lista de la compra: ${URL_CESTA}`;
+  const mensajeCodificado = encodeURIComponent(mensaje);
+  return `https://wa.me/${numero}?text=${mensajeCodificado}`;
+}
 
 export default function CestaPage() {
   const [items, setItems] = useState<CestaRow[]>([]);
@@ -25,7 +36,7 @@ export default function CestaPage() {
     async function loadCesta() {
       const { data, error } = await supabase
         .from("cesta")
-        .select("id, comentario_ia, products(nombre, emoji)")
+        .select("id, comentario_ia, comprado, products(nombre, emoji)")
         .order("creado_en", { ascending: false });
 
       if (!error && data) {
@@ -57,6 +68,11 @@ export default function CestaPage() {
     await supabase.from("cesta").delete().eq("id", id);
   }
 
+  async function handleToggle(id: string, comprado: boolean) {
+    const supabase = createClient();
+    await supabase.from("cesta").update({ comprado }).eq("id", id);
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -76,8 +92,8 @@ export default function CestaPage() {
         </h1>
         <div className="flex gap-2">
           
-            <a
-            href={generarLinkWhatsApp(items, "javi")}
+          <a
+            href={generarLinkSimple("javi")}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 text-center text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-colors"
@@ -85,8 +101,8 @@ export default function CestaPage() {
             Enviar a Javi
           </a>
           
-            <a
-            href={generarLinkWhatsApp(items, "vane")}
+          <a
+            href={generarLinkSimple("vane")}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 text-center text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-colors"
@@ -105,7 +121,12 @@ export default function CestaPage() {
 
         <AnimatePresence>
           {items.map((item) => (
-            <CestaItem key={item.id} item={item} onRemove={handleRemove} />
+            <CestaItem
+              key={item.id}
+              item={item}
+              onRemove={handleRemove}
+              onToggle={handleToggle}
+            />
           ))}
         </AnimatePresence>
       </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { elegirFraseSinRepetir } from "@/lib/frases";
 import ProductCard from "@/components/ProductCard";
+import SeniorRexReaction from "@/components/SeniorRexReaction";
 
 type Product = {
   id: string;
@@ -17,6 +18,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [addingId, setAddingId] = useState<string | null>(null);
+  const [rexTrigger, setRexTrigger] = useState(0);
 
   useEffect(() => {
     const supabase = createClient();
@@ -48,6 +50,7 @@ export default function Home() {
     });
 
     setAddingId(null);
+    setRexTrigger((prev) => prev + 1);
   }
 
   const filtered = products.filter((p) =>
@@ -70,8 +73,10 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-black text-white pb-24">
+      <SeniorRexReaction trigger={rexTrigger} type="yes" />
+
       <div className="sticky top-0 z-10 bg-black border-b border-zinc-800 p-4">
-  <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3">
           <h1 className="text-xl font-semibold">Lista de la Compra 9.0</h1>
           <a href="/cesta" className="text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg transition-colors">
             Ver cesta

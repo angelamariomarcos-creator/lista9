@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase";
 import CestaItem from "@/components/CestaItem";
+import SeniorRexReaction from "@/components/SeniorRexReaction";
 
 type CestaRow = {
   id: string;
@@ -29,6 +30,7 @@ function generarLinkSimple(destinatario: "javi" | "vane"): string {
 export default function CestaPage() {
   const [items, setItems] = useState<CestaRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [rexTrigger, setRexTrigger] = useState(0);
 
   useEffect(() => {
     const supabase = createClient();
@@ -66,6 +68,7 @@ export default function CestaPage() {
   async function handleRemove(id: string) {
     const supabase = createClient();
     await supabase.from("cesta").delete().eq("id", id);
+    setRexTrigger((prev) => prev + 1);
   }
 
   async function handleToggle(id: string, comprado: boolean) {
@@ -83,6 +86,8 @@ export default function CestaPage() {
 
   return (
     <main className="min-h-screen bg-black text-white pb-24">
+      <SeniorRexReaction trigger={rexTrigger} type="no" />
+
       <div className="sticky top-0 z-10 bg-black border-b border-zinc-800 p-4">
         <h1 className="text-xl font-semibold mb-3">
           Tu cesta{" "}
@@ -91,22 +96,10 @@ export default function CestaPage() {
           </span>
         </h1>
         <div className="flex gap-2">
-          
-          <a
-            href={generarLinkSimple("javi")}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 text-center text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-colors"
-          >
+          <a href={generarLinkSimple("javi")} target="_blank" rel="noopener noreferrer" className="flex-1 text-center text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-colors">
             Enviar a Javi
           </a>
-          
-          <a
-            href={generarLinkSimple("vane")}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 text-center text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-colors"
-          >
+          <a href={generarLinkSimple("vane")} target="_blank" rel="noopener noreferrer" className="flex-1 text-center text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-colors">
             Enviar a Vane
           </a>
         </div>

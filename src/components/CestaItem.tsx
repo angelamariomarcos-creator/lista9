@@ -15,11 +15,25 @@ type CestaItemData = {
 
 type CestaItemProps = {
   item: CestaItemData;
+  nombreAnadido?: string;
   onRemove: (id: string) => void;
   onToggle: (id: string, comprado: boolean) => void;
 };
 
-export default function CestaItem({ item, onRemove, onToggle }: CestaItemProps) {
+const COLORES_AVATAR: Record<string, string> = {
+  Javi: "bg-emerald-600",
+  Vanesa: "bg-pink-500",
+  Vane: "bg-pink-500",
+  Angela: "bg-purple-500",
+  Mario: "bg-blue-500",
+  Marcos: "bg-amber-500",
+};
+
+function colorParaNombre(nombre: string): string {
+  return COLORES_AVATAR[nombre] ?? "bg-zinc-600";
+}
+
+export default function CestaItem({ item, nombreAnadido, onRemove, onToggle }: CestaItemProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -59,6 +73,15 @@ export default function CestaItem({ item, onRemove, onToggle }: CestaItemProps) 
           </p>
         )}
       </div>
+
+      {nombreAnadido && (
+        <div
+          className={`flex-shrink-0 w-6 h-6 rounded-full ${colorParaNombre(nombreAnadido)} flex items-center justify-center text-[10px] font-semibold text-white`}
+          title={`Añadido por ${nombreAnadido}`}
+        >
+          {nombreAnadido.charAt(0).toUpperCase()}
+        </div>
+      )}
 
       <button
         onClick={() => onRemove(item.id)}

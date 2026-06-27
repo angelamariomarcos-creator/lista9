@@ -10,6 +10,7 @@ type CestaRow = {
   id: string;
   comentario_ia: string | null;
   comprado: boolean;
+  anadido_por: string | null;
   products: {
     nombre: string;
     emoji: string;
@@ -29,16 +30,31 @@ function generarLinkSimple(destinatario: "javi" | "vane"): string {
 
 export default function CestaPage() {
   const [items, setItems] = useState<CestaRow[]>([]);
+  const [miembros, setMiembros] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [rexTrigger, setRexTrigger] = useState(0);
 
   useEffect(() => {
     const supabase = createClient();
 
+    async function loadMiembros() {
+      const { data } = await supabase
+        .from("family_members")
+        .select("user_id, nombre");
+
+      if (data) {
+        const mapa: Record<string, string> = {};
+        data.forEach((m) => {
+          if (m.user_id && m.nombre) mapa[m.user_id] = m.nombre;
+        });
+        setMiembros(mapa);
+      }
+    }
+
     async function loadCesta() {
       const { data, error } = await supabase
         .from("cesta")
-        .select("id, comentario_ia, comprado, products(nombre, emoji)")
+        .select("id, comentario_ia, comprado, anadido_por, products(nombre, emoji)")
         .order("creado_en", { ascending: false });
 
       if (!error && data) {
@@ -47,6 +63,7 @@ export default function CestaPage() {
       setLoading(false);
     }
 
+    loadMiembros();
     loadCesta();
 
     const channel = supabase
@@ -117,6 +134,7 @@ export default function CestaPage() {
             <CestaItem
               key={item.id}
               item={item}
+              nombreAnadido={item.anadido_por ? miembros[item.anadido_por] : undefined}
               onRemove={handleRemove}
               onToggle={handleToggle}
             />

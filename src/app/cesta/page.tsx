@@ -126,12 +126,17 @@ export default function CestaPage() {
 
       <div className="sticky top-0 z-10 bg-black border-b border-zinc-800 p-4">
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-xl font-semibold">
-            Tu cesta{" "}
-            <span className="text-zinc-500 text-sm font-normal">
-              ({items.length})
-            </span>
-          </h1>
+          <div className="flex items-center gap-2">
+            <a href="/" className="text-zinc-400 hover:text-white text-xl" aria-label="Volver al inicio">
+              ←
+            </a>
+            <h1 className="text-xl font-semibold">
+              Tu cesta{" "}
+              <span className="text-zinc-500 text-sm font-normal">
+                ({items.length})
+              </span>
+            </h1>
+          </div>
           {items.length > 0 && (
             <button
               onClick={handleVaciar}

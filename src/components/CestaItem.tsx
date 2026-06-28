@@ -37,9 +37,13 @@ export default function CestaItem({ item, nombreAnadido, onRemove, onToggle }: C
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ opacity: item.comprado ? 0.45 : 1, y: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="flex items-center gap-3 rounded-xl bg-zinc-900 border border-zinc-800 p-3"
+      className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${
+        item.comprado
+          ? "bg-zinc-950 border-zinc-900"
+          : "bg-zinc-900 border-zinc-800"
+      }`}
     >
       <button
         onClick={() => onToggle(item.id, !item.comprado)}
@@ -53,7 +57,9 @@ export default function CestaItem({ item, nombreAnadido, onRemove, onToggle }: C
         {item.comprado && <Check size={14} className="text-white" />}
       </button>
 
-      <span className="text-2xl">{item.products?.emoji ?? "🛒"}</span>
+      <span className={`text-2xl ${item.comprado ? "grayscale" : ""}`}>
+        {item.products?.emoji ?? "🛒"}
+      </span>
 
       <div className="flex-1 min-w-0">
         <p
@@ -63,12 +69,8 @@ export default function CestaItem({ item, nombreAnadido, onRemove, onToggle }: C
         >
           {item.products?.nombre ?? "Producto"}
         </p>
-        {item.comentario_ia && (
-          <p
-            className={`text-xs italic leading-snug mt-0.5 ${
-              item.comprado ? "text-zinc-600 line-through" : "text-zinc-400"
-            }`}
-          >
+        {item.comentario_ia && !item.comprado && (
+          <p className="text-xs italic leading-snug mt-0.5 text-zinc-400">
             {item.comentario_ia}
           </p>
         )}

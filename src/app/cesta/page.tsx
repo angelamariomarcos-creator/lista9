@@ -33,6 +33,7 @@ export default function CestaPage() {
   const [miembros, setMiembros] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [rexTrigger, setRexTrigger] = useState(0);
+  const [vaciando, setVaciando] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -93,6 +94,18 @@ export default function CestaPage() {
     await supabase.from("cesta").update({ comprado }).eq("id", id);
   }
 
+  async function handleVaciar() {
+    const confirmar = window.confirm(
+      "¿Seguro que quieres vaciar toda la cesta? Esta acción no se puede deshacer."
+    );
+    if (!confirmar) return;
+
+    setVaciando(true);
+    const supabase = createClient();
+    await supabase.from("cesta").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    setVaciando(false);
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -106,12 +119,23 @@ export default function CestaPage() {
       <SeniorRexReaction trigger={rexTrigger} type="no" />
 
       <div className="sticky top-0 z-10 bg-black border-b border-zinc-800 p-4">
-        <h1 className="text-xl font-semibold mb-3">
-          Tu cesta{" "}
-          <span className="text-zinc-500 text-sm font-normal">
-            ({items.length})
-          </span>
-        </h1>
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-xl font-semibold">
+            Tu cesta{" "}
+            <span className="text-zinc-500 text-sm font-normal">
+              ({items.length})
+            </span>
+          </h1>
+          {items.length > 0 && (
+            <button
+              onClick={handleVaciar}
+              disabled={vaciando}
+              className="text-sm text-red-400 hover:text-red-300 border border-red-900 hover:border-red-700 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+            >
+              {vaciando ? "Vaciando..." : "Vaciar cesta"}
+            </button>
+          )}
+        </div>
         <div className="flex gap-2">
           <a href={generarLinkSimple("javi")} target="_blank" rel="noopener noreferrer" className="flex-1 text-center text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-colors">
             Enviar a Javi

@@ -44,9 +44,12 @@ export default function Home() {
     const supabase = createClient();
     const frase = await elegirFraseSinRepetir(product.id);
 
+    const { data: userData } = await supabase.auth.getUser();
+
     await supabase.from("cesta").insert({
       product_id: product.id,
       comentario_ia: frase,
+      anadido_por: userData.user?.id ?? null,
     });
 
     setAddingId(null);
@@ -78,9 +81,14 @@ export default function Home() {
       <div className="sticky top-0 z-10 bg-black border-b border-zinc-800 p-4">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-xl font-semibold">Lista de la Compra 9.0</h1>
-          <a href="/cesta" className="text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg transition-colors">
-            Ver cesta
-          </a>
+          <div className="flex gap-2">
+            <a href="/gastos" className="text-sm bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded-lg transition-colors">
+              Gastos
+            </a>
+            <a href="/cesta" className="text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg transition-colors">
+              Ver cesta
+            </a>
+          </div>
         </div>
         <input
           type="text"

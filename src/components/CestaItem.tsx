@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Trash2, Check } from "lucide-react";
+import { Trash2, Check, Search } from "lucide-react";
 
 type CestaItemData = {
   id: string;
@@ -84,6 +84,10 @@ export default function CestaItem({ item, nombreAnadido, onRemove, onToggle }: C
           {nombreAnadido.charAt(0).toUpperCase()}
         </div>
       )}
+
+      <a href={`https://www.google.com/search?q=${encodeURIComponent((item.products?.nombre ?? "") + " precio supermercado")}`} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 p-2 rounded-lg text-zinc-500 hover:text-emerald-400 hover:bg-emerald-950/30 transition-colors" aria-label="Buscar precio en Google">
+        <Search size={16} />
+      </a>
 
       <button
         onClick={() => onRemove(item.id)}

@@ -15,6 +15,13 @@ type ItemConCategoria = {
   precio: number;
 };
 
+type TicketItemCompleto = {
+  nombre_producto: string;
+  categoria: string;
+  precio: number;
+  tickets: { creado_en: string; total: number } | null;
+};
+
 export default function GastosPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [porCategoria, setPorCategoria] = useState<Record<string, number>>({});
@@ -65,6 +72,42 @@ export default function GastosPage() {
     return `${totalMes.toFixed(0)}€ este mes... ¿estáis comprando para un búnker nuclear o qué pasa aquí?`;
   }
 
+  async function handleExportarCSV() {
+    const supabase = createClient();
+    const inicioMes = new Date();
+    inicioMes.setDate(1);
+    inicioMes.setHours(0, 0, 0, 0);
+
+    const { data: itemsData } = await supabase
+      .from("ticket_items")
+      .select("nombre_producto, categoria, precio, tickets!inner(creado_en, total)")
+      .gte("tickets.creado_en", inicioMes.toISOString())
+      .order("tickets.creado_en", { ascending: true });
+
+    if (!itemsData || itemsData.length === 0) {
+      alert("No hay datos para exportar este mes.");
+      return;
+    }
+
+    const filas = (itemsData as unknown as TicketItemCompleto[]).map((item) => {
+      const fecha = item.tickets ? new Date(item.tickets.creado_en).toLocaleDateString("es-ES") : "";
+      return `"${fecha}","${item.nombre_producto}","${item.categoria}","${Number(item.precio).toFixed(2)}"`;
+    });
+
+    const cabecera = '"Fecha","Producto","Categoria","Precio (EUR)"';
+    const totalFila = `"","TOTAL","","${totalMes.toFixed(2)}"`;
+    const csv = [cabecera, ...filas, totalFila].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const mes = new Date().toLocaleString("es-ES", { month: "long", year: "numeric" });
+    link.href = url;
+    link.download = `gastos_${mes}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -75,11 +118,21 @@ export default function GastosPage() {
 
   return (
     <main className="min-h-screen bg-black text-white pb-24 p-4">
-      <div className="flex items-center gap-2 mb-4">
-        <a href="/" className="text-zinc-400 hover:text-white text-xl" aria-label="Volver al inicio">
-          ←
-        </a>
-        <h1 className="text-xl font-semibold">Gastos del mes</h1>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <a href="/" className="text-zinc-400 hover:text-white text-xl" aria-label="Volver al inicio">
+            ←
+          </a>
+          <h1 className="text-xl font-semibold">Gastos del mes</h1>
+        </div>
+        {tickets.length > 0 && (
+          <button
+            onClick={handleExportarCSV}
+            className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            Exportar CSV
+          </button>
+        )}
       </div>
 
       <a href="/tickets" className="block text-center bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-lg font-medium mb-6">

@@ -6,12 +6,9 @@ type CestaItemForMessage = {
   } | null;
 };
 
-const NUMERO_JAVI = "34669558210";
-const NUMERO_VANE = "34626248847";
-
 function construirMensaje(items: CestaItemForMessage[]): string {
   if (items.length === 0) {
-    return "La cesta esta vacia, Senior Rex no tiene nada que enviar.";
+    return "La cesta está vacía, Senior Rex no tiene nada que enviar.";
   }
 
   const lineas = items.map((item) => {
@@ -30,12 +27,10 @@ function construirMensaje(items: CestaItemForMessage[]): string {
   ].join("\n");
 }
 
-export function generarLinkWhatsApp(
-  items: CestaItemForMessage[],
-  destinatario: "javi" | "vane"
-): string {
-  const numero = destinatario === "javi" ? NUMERO_JAVI : NUMERO_VANE;
+export function generarLinkWhatsApp(items: CestaItemForMessage[]): string {
   const mensaje = construirMensaje(items);
   const mensajeCodificado = encodeURIComponent(mensaje);
-  return `https://wa.me/${numero}?text=${mensajeCodificado}`;
+  
+  // Al no incluir ningún número, WhatsApp abrirá la agenda del usuario para elegir destinatario
+  return `https://api.whatsapp.com/send/?text=${mensajeCodificado}`;
 }

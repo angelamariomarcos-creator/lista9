@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase";
 import { elegirFraseSinRepetir } from "@/lib/frases";
 import ProductCard from "@/components/ProductCard";
 import SeniorRexReaction from "@/components/SeniorRexReaction";
+import PrediccionRex from "@/components/PrediccionRex";
 
 type Product = {
   id: string;
@@ -50,6 +51,11 @@ export default function Home() {
       product_id: product.id,
       comentario_ia: frase,
       anadido_por: userData.user?.id ?? null,
+    });
+
+    await supabase.from("historial_compras").insert({
+      product_id: product.id,
+      family_id: "a3e746d1-2cac-4f07-a988-de3678c1fe00",
     });
 
     setAddingId(null);
@@ -98,6 +104,8 @@ export default function Home() {
           className="w-full rounded-lg bg-zinc-900 border border-zinc-800 px-4 py-2 text-sm focus:outline-none focus:border-emerald-600"
         />
       </div>
+
+      <PrediccionRex onAdd={handleAdd} />
 
       <div className="p-4 space-y-6">
         {Object.entries(grouped).map(([categoria, items]) => (

@@ -14,6 +14,7 @@ type CestaRow = {
   products: {
     nombre: string;
     emoji: string;
+    categoria: string;
   } | null;
 };
 
@@ -34,6 +35,7 @@ export default function CestaPage() {
   const [loading, setLoading] = useState(true);
   const [rexTrigger, setRexTrigger] = useState(0);
   const [vaciando, setVaciando] = useState(false);
+  const [modoPasillos, setModoPasillos] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -55,7 +57,7 @@ export default function CestaPage() {
     async function loadCesta() {
       const { data, error } = await supabase
         .from("cesta")
-        .select("id, comentario_ia, comprado, anadido_por, products(nombre, emoji)")
+        .select("id, comentario_ia, comprado, anadido_por, products(nombre, emoji, categoria)")
         .order("creado_en", { ascending: false });
 
       if (!error && data) {
@@ -112,6 +114,13 @@ export default function CestaPage() {
     setVaciando(false);
   }
 
+  const itemsAgrupados = items.reduce<Record<string, CestaRow[]>>((acc, item) => {
+    const categoria = item.products?.categoria ?? "Otros";
+    if (!acc[categoria]) acc[categoria] = [];
+    acc[categoria].push(item);
+    return acc;
+  }, {});
+
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -147,11 +156,29 @@ export default function CestaPage() {
             </button>
           )}
         </div>
+
+        {items.length > 0 && (
+          <div className="flex gap-2 mb-3">
+            <button
+              onClick={() => setModoPasillos(false)}
+              className={`flex-1 text-sm py-1.5 rounded-lg transition-colors ${!modoPasillos ? "bg-emerald-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-white"}`}
+            >
+              Por orden
+            </button>
+            <button
+              onClick={() => setModoPasillos(true)}
+              className={`flex-1 text-sm py-1.5 rounded-lg transition-colors ${modoPasillos ? "bg-emerald-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-white"}`}
+            >
+              🛒 Por pasillos
+            </button>
+          </div>
+        )}
+
         <div className="flex gap-2">
-          <a href={generarLinkSimple("javi")} target="_blank" rel="noopener noreferrer" className="flex-1 text-center text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-colors">
+          <a href={generarLinkSimple("javi")} target="_blank" rel="noopener noreferrer" className="flex-1 text-center text-sm bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-lg transition-colors">
             Enviar a Javi
           </a>
-          <a href={generarLinkSimple("vane")} target="_blank" rel="noopener noreferrer" className="flex-1 text-center text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg transition-colors">
+          <a href={generarLinkSimple("vane")} target="_blank" rel="noopener noreferrer" className="flex-1 text-center text-sm bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-2 rounded-lg transition-colors">
             Enviar a Vane
           </a>
         </div>
@@ -164,17 +191,44 @@ export default function CestaPage() {
           </p>
         )}
 
-        <AnimatePresence>
-          {items.map((item) => (
-            <CestaItem
-              key={item.id}
-              item={item}
-              nombreAnadido={item.anadido_por ? miembros[item.anadido_por] : undefined}
-              onRemove={handleRemove}
-              onToggle={handleToggle}
-            />
-          ))}
-        </AnimatePresence>
+        {!modoPasillos ? (
+          <AnimatePresence>
+            {items.map((item) => (
+              <CestaItem
+                key={item.id}
+                item={item}
+                nombreAnadido={item.anadido_por ? miembros[item.anadido_por] : undefined}
+                onRemove={handleRemove}
+                onToggle={handleToggle}
+              />
+            ))}
+          </AnimatePresence>
+        ) : (
+          <div className="space-y-4">
+            {Object.entries(itemsAgrupados)
+              .sort((a, b) => a[0].localeCompare(b[0]))
+              .map(([categoria, catItems]) => (
+                <div key={categoria}>
+                  <h2 className="text-xs font-medium text-emerald-400 uppercase tracking-wide mb-2">
+                    {categoria} ({catItems.length})
+                  </h2>
+                  <div className="space-y-2">
+                    <AnimatePresence>
+                      {catItems.map((item) => (
+                        <CestaItem
+                          key={item.id}
+                          item={item}
+                          nombreAnadido={item.anadido_por ? miembros[item.anadido_por] : undefined}
+                          onRemove={handleRemove}
+                          onToggle={handleToggle}
+                        />
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
       </div>
     </main>
   );

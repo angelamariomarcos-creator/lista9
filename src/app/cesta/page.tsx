@@ -15,6 +15,7 @@ type CestaRow = {
     nombre: string;
     emoji: string;
     categoria: string;
+    precio: number;
   } | null;
 };
 
@@ -57,7 +58,7 @@ export default function CestaPage() {
     async function loadCesta() {
       const { data, error } = await supabase
         .from("cesta")
-        .select("id, comentario_ia, comprado, anadido_por, products(nombre, emoji, categoria)")
+        .select("id, comentario_ia, comprado, anadido_por, products(nombre, emoji, categoria, precio)")
         .order("creado_en", { ascending: false });
 
       if (!error && data) {
@@ -121,6 +122,14 @@ export default function CestaPage() {
     return acc;
   }, {});
 
+  const totalPendiente = items
+    .filter((i) => !i.comprado)
+    .reduce((acc, i) => acc + (i.products?.precio ?? 0), 0);
+
+  const totalComprado = items
+    .filter((i) => i.comprado)
+    .reduce((acc, i) => acc + (i.products?.precio ?? 0), 0);
+
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -156,6 +165,25 @@ export default function CestaPage() {
             </button>
           )}
         </div>
+
+        {items.length > 0 && (
+          <div className="flex gap-2 mb-3 bg-zinc-900 rounded-xl p-3">
+            <div className="flex-1 text-center">
+              <p className="text-xs text-zinc-500 mb-0.5">Pendiente</p>
+              <p className="text-lg font-bold text-white">{totalPendiente.toFixed(2)} €</p>
+            </div>
+            <div className="w-px bg-zinc-700" />
+            <div className="flex-1 text-center">
+              <p className="text-xs text-zinc-500 mb-0.5">Comprado</p>
+              <p className="text-lg font-bold text-emerald-400">{totalComprado.toFixed(2)} €</p>
+            </div>
+            <div className="w-px bg-zinc-700" />
+            <div className="flex-1 text-center">
+              <p className="text-xs text-zinc-500 mb-0.5">Total</p>
+              <p className="text-lg font-bold text-zinc-300">{(totalPendiente + totalComprado).toFixed(2)} €</p>
+            </div>
+          </div>
+        )}
 
         {items.length > 0 && (
           <div className="flex gap-2 mb-3">

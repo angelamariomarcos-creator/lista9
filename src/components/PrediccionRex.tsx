@@ -15,6 +15,7 @@ type ProductoBasico = {
   nombre: string;
   emoji: string;
   categoria: string;
+  precio: number;
 };
 
 type PrediccionRexProps = {
@@ -101,7 +102,7 @@ export default function PrediccionRex({ onAdd }: PrediccionRexProps) {
                 </span>
               </span>
               <button
-                onClick={() => onAdd({ id: s.product_id, nombre: s.nombre, emoji: s.emoji, categoria: "" })}
+                onClick={() => onAdd({ id: s.product_id, nombre: s.nombre, emoji: s.emoji, categoria: "", precio: 0 })}
                 className="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded-md transition-colors"
               >
                 + Añadir

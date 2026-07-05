@@ -7,6 +7,7 @@ type Product = {
   nombre: string;
   categoria: string;
   emoji: string;
+  precio: number;
 };
 
 type ProductCardProps = {

@@ -128,19 +128,11 @@ export default function Home() {
       <div className="sticky top-0 z-10 bg-black border-b border-zinc-800 p-4">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-xl font-semibold">Lista de la Compra 9.0</h1>
-          <div className="flex items-center gap-2">
-            {totalCesta > 0 && (
-              <span className="text-sm font-medium text-emerald-400 bg-emerald-950 px-2 py-1 rounded-lg">
-                ~{totalCesta.toFixed(2)} €
-              </span>
-            )}
-            <a href="/gastos" className="text-sm bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded-lg transition-colors">
-              Gastos
-            </a>
-            <a href="/cesta" className="text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg transition-colors">
-              Ver cesta
-            </a>
-          </div>
+          {totalCesta > 0 && (
+            <span className="text-sm font-medium text-emerald-400 bg-emerald-950 px-2 py-1 rounded-lg">
+              ~{totalCesta.toFixed(2)} €
+            </span>
+          )}
         </div>
         <input
           type="text"

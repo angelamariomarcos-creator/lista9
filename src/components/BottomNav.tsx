@@ -1,11 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ShoppingCart, Home, Receipt, User } from "lucide-react";
+import { ShoppingCart, Receipt, User, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 
-export default function BottomNav() {
+export default function TopNav() {
   const pathname = usePathname();
   const [email, setEmail] = useState<string | null>(null);
 
@@ -23,30 +23,33 @@ export default function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-zinc-800 flex items-center justify-around px-2 py-2">
-      <a href="/" className={`flex flex-col items-center gap-0.5 px-4 py-1 transition-colors ${pathname === "/" ? "text-emerald-400" : "text-zinc-500 hover:text-white"}`}>
-        <Home size={22} />
-        <span className="text-[10px]">Inicio</span>
+    <header className="sticky top-0 z-50 bg-black border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
+      <a href="/" className="flex items-center gap-2">
+        <span className="text-2xl">🦖</span>
+        <span className="text-sm font-bold text-white">Lista 9.0</span>
       </a>
-      <a href="/cesta" className={`flex flex-col items-center gap-0.5 px-4 py-1 transition-colors ${pathname === "/cesta" ? "text-emerald-400" : "text-zinc-500 hover:text-white"}`}>
-        <ShoppingCart size={22} />
-        <span className="text-[10px]">Cesta</span>
-      </a>
-      <a href="/gastos" className={`flex flex-col items-center gap-0.5 px-4 py-1 transition-colors ${pathname === "/gastos" ? "text-emerald-400" : "text-zinc-500 hover:text-white"}`}>
-        <Receipt size={22} />
-        <span className="text-[10px]">Gastos</span>
-      </a>
-      {email ? (
-        <button onClick={handleLogout} className="flex flex-col items-center gap-0.5 px-4 py-1 text-zinc-500 hover:text-white transition-colors">
-          <User size={22} />
-          <span className="text-[10px]">Salir</span>
-        </button>
-      ) : (
-        <a href="/login" className={`flex flex-col items-center gap-0.5 px-4 py-1 transition-colors ${pathname === "/login" ? "text-emerald-400" : "text-zinc-500 hover:text-white"}`}>
-          <User size={22} />
-          <span className="text-[10px]">Entrar</span>
+
+      <div className="flex items-center gap-1">
+        <a href="/cesta" className={`flex flex-col items-center px-3 py-1 rounded-lg transition-colors ${pathname === "/cesta" ? "text-emerald-400" : "text-zinc-500 hover:text-white"}`}>
+          <ShoppingCart size={20} />
+          <span className="text-[9px] mt-0.5">Cesta</span>
         </a>
-      )}
-    </nav>
+        <a href="/gastos" className={`flex flex-col items-center px-3 py-1 rounded-lg transition-colors ${pathname === "/gastos" ? "text-emerald-400" : "text-zinc-500 hover:text-white"}`}>
+          <Receipt size={20} />
+          <span className="text-[9px] mt-0.5">Gastos</span>
+        </a>
+        {email ? (
+          <button onClick={handleLogout} className="flex flex-col items-center px-3 py-1 rounded-lg text-zinc-500 hover:text-white transition-colors">
+            <LogOut size={20} />
+            <span className="text-[9px] mt-0.5">Salir</span>
+          </button>
+        ) : (
+          <a href="/login" className={`flex flex-col items-center px-3 py-1 rounded-lg transition-colors ${pathname === "/login" ? "text-emerald-400" : "text-zinc-500 hover:text-white"}`}>
+            <User size={20} />
+            <span className="text-[9px] mt-0.5">Entrar</span>
+          </a>
+        )}
+      </div>
+    </header>
   );
 }

@@ -95,6 +95,15 @@ export default function Home() {
       family_id: "a3e746d1-2cac-4f07-a988-de3678c1fe00",
     });
 
+    fetch("/api/notificar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        producto: product.nombre,
+        familia_id: "a3e746d1-2cac-4f07-a988-de3678c1fe00",
+      }),
+    }).catch(() => {});
+
     setAddingId(null);
     setRexTrigger((prev) => prev + 1);
   }

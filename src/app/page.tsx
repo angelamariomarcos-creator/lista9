@@ -37,6 +37,8 @@ export default function Home() {
   const [rexTrigger, setRexTrigger] = useState(0);
   const [categoriaActiva, setCategoriaActiva] = useState<string | null>(null);
   const [totalCesta, setTotalCesta] = useState(0);
+  const [despensaIds, setDespensaIds] = useState<Set<string>>(new Set());
+  const [despensaRowIds, setDespensaRowIds] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const supabase = createClient();
@@ -65,8 +67,24 @@ export default function Home() {
       }
     }
 
+    async function loadDespensa() {
+      const { data } = await supabase
+        .from("despensa")
+        .select("id, product_id")
+        .eq("family_id", "a3e746d1-2cac-4f07-a988-de3678c1fe00");
+
+      if (data) {
+        const ids = new Set(data.map((d) => d.product_id as string));
+        const rowIds: Record<string, string> = {};
+        data.forEach((d) => { rowIds[d.product_id as string] = d.id as string; });
+        setDespensaIds(ids);
+        setDespensaRowIds(rowIds);
+      }
+    }
+
     loadProducts();
     loadTotalCesta();
+    loadDespensa();
 
     const channel = supabase
       .channel("cesta-home-realtime")
@@ -106,6 +124,27 @@ export default function Home() {
 
     setAddingId(null);
     setRexTrigger((prev) => prev + 1);
+  }
+
+  async function handleDespensa(product: Product) {
+    const supabase = createClient();
+
+    if (despensaIds.has(product.id)) {
+      const rowId = despensaRowIds[product.id];
+      await supabase.from("despensa").delete().eq("id", rowId);
+      setDespensaIds((prev) => { const next = new Set(prev); next.delete(product.id); return next; });
+      setDespensaRowIds((prev) => { const next = { ...prev }; delete next[product.id]; return next; });
+    } else {
+      const { data } = await supabase.from("despensa").insert({
+        product_id: product.id,
+        family_id: "a3e746d1-2cac-4f07-a988-de3678c1fe00",
+      }).select().single();
+
+      if (data) {
+        setDespensaIds((prev) => new Set([...prev, product.id]));
+        setDespensaRowIds((prev) => ({ ...prev, [product.id]: data.id }));
+      }
+    }
   }
 
   const categorias = Array.from(new Set(products.map((p) => p.categoria))).sort();
@@ -156,7 +195,12 @@ export default function Home() {
 
       {!categoriaActiva && !search && (
         <div className="p-4">
-          <p className="text-xs text-zinc-500 uppercase tracking-wide mb-3">Categorías</p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs text-zinc-500 uppercase tracking-wide">Categorías</p>
+            <a href="/despensa" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+              🏠 Mi despensa ({despensaIds.size})
+            </a>
+          </div>
           <div className="grid grid-cols-3 gap-3">
             {categorias.map((cat) => (
               <button
@@ -196,7 +240,9 @@ export default function Home() {
                     key={product.id}
                     product={product}
                     onAdd={handleAdd}
+                    onDespensa={handleDespensa}
                     isAdding={addingId === product.id}
+                    enDespensa={despensaIds.has(product.id)}
                   />
                 ))}
               </div>

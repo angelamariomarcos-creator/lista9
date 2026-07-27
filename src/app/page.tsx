@@ -39,6 +39,7 @@ export default function Home() {
   const [totalCesta, setTotalCesta] = useState(0);
   const [despensaIds, setDespensaIds] = useState<Set<string>>(new Set());
   const [despensaRowIds, setDespensaRowIds] = useState<Record<string, string>>({});
+  const [despensaEstados, setDespensaEstados] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const supabase = createClient();
@@ -49,7 +50,6 @@ export default function Home() {
         .select("*")
         .order("categoria")
         .order("nombre");
-
       if (!error && data) setProducts(data);
       setLoading(false);
     }
@@ -59,7 +59,6 @@ export default function Home() {
         .from("cesta")
         .select("products(precio)")
         .eq("comprado", false);
-
       if (data) {
         const total = (data as unknown as { products: { precio: number } | null }[])
           .reduce((acc, row) => acc + (row.products?.precio ?? 0), 0);
@@ -70,15 +69,19 @@ export default function Home() {
     async function loadDespensa() {
       const { data } = await supabase
         .from("despensa")
-        .select("id, product_id")
+        .select("id, product_id, estado")
         .eq("family_id", "a3e746d1-2cac-4f07-a988-de3678c1fe00");
-
       if (data) {
         const ids = new Set(data.map((d) => d.product_id as string));
         const rowIds: Record<string, string> = {};
-        data.forEach((d) => { rowIds[d.product_id as string] = d.id as string; });
+        const estados: Record<string, string> = {};
+        data.forEach((d) => {
+          rowIds[d.product_id as string] = d.id as string;
+          estados[d.product_id as string] = d.estado as string;
+        });
         setDespensaIds(ids);
         setDespensaRowIds(rowIds);
+        setDespensaEstados(estados);
       }
     }
 
@@ -126,23 +129,33 @@ export default function Home() {
     setRexTrigger((prev) => prev + 1);
   }
 
-  async function handleDespensa(product: Product) {
+  async function handleDespensa(product: Product, estado: string) {
     const supabase = createClient();
 
-    if (despensaIds.has(product.id)) {
+    if (estado === "quitar") {
       const rowId = despensaRowIds[product.id];
       await supabase.from("despensa").delete().eq("id", rowId);
       setDespensaIds((prev) => { const next = new Set(prev); next.delete(product.id); return next; });
       setDespensaRowIds((prev) => { const next = { ...prev }; delete next[product.id]; return next; });
+      setDespensaEstados((prev) => { const next = { ...prev }; delete next[product.id]; return next; });
+      return;
+    }
+
+    if (despensaIds.has(product.id)) {
+      const rowId = despensaRowIds[product.id];
+      await supabase.from("despensa").update({ estado }).eq("id", rowId);
+      setDespensaEstados((prev) => ({ ...prev, [product.id]: estado }));
     } else {
       const { data } = await supabase.from("despensa").insert({
         product_id: product.id,
         family_id: "a3e746d1-2cac-4f07-a988-de3678c1fe00",
+        estado,
       }).select().single();
 
       if (data) {
         setDespensaIds((prev) => new Set([...prev, product.id]));
         setDespensaRowIds((prev) => ({ ...prev, [product.id]: data.id }));
+        setDespensaEstados((prev) => ({ ...prev, [product.id]: estado }));
       }
     }
   }
@@ -176,11 +189,16 @@ export default function Home() {
       <div className="sticky top-0 z-10 bg-black border-b border-zinc-800 p-4">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-xl font-semibold">Lista de la Compra 9.0</h1>
-          {totalCesta > 0 && (
-            <span className="text-sm font-medium text-emerald-400 bg-emerald-950 px-2 py-1 rounded-lg">
-              ~{totalCesta.toFixed(2)} €
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {totalCesta > 0 && (
+              <span className="text-sm font-medium text-emerald-400 bg-emerald-950 px-2 py-1 rounded-lg">
+                ~{totalCesta.toFixed(2)} €
+              </span>
+            )}
+            <a href="/despensa" className="text-xs text-blue-400 hover:text-blue-300 bg-blue-950 px-2 py-1 rounded-lg transition-colors">
+              🏠 {despensaIds.size}
+            </a>
+          </div>
         </div>
         <input
           type="text"
@@ -195,12 +213,7 @@ export default function Home() {
 
       {!categoriaActiva && !search && (
         <div className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs text-zinc-500 uppercase tracking-wide">Categorías</p>
-            <a href="/despensa" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
-              🏠 Mi despensa ({despensaIds.size})
-            </a>
-          </div>
+          <p className="text-xs text-zinc-500 uppercase tracking-wide mb-3">Categorías</p>
           <div className="grid grid-cols-3 gap-3">
             {categorias.map((cat) => (
               <button
@@ -243,6 +256,7 @@ export default function Home() {
                     onDespensa={handleDespensa}
                     isAdding={addingId === product.id}
                     enDespensa={despensaIds.has(product.id)}
+                    estadoDespensa={despensaEstados[product.id]}
                   />
                 ))}
               </div>

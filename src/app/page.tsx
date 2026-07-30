@@ -15,18 +15,18 @@ type Product = {
   precio: number;
 };
 
-const CATEGORIA_EMOJIS: Record<string, string> = {
-  "Bebidas": "🥤",
-  "Carnicería": "🥩",
-  "Congelados": "🧊",
-  "Despensa": "🫙",
-  "Frutería": "🍎",
-  "Higiene": "🧴",
-  "Lácteos": "🥛",
-  "Limpieza": "🧹",
-  "Panadería": "🍞",
-  "Pescadería": "🐟",
-  "Verdura": "🥦",
+const CATEGORIA_ICONOS: Record<string, string> = {
+  "Bebidas": "/categorias/bebidas.png",
+  "Carnicería": "/categorias/carniceria.png",
+  "Congelados": "/categorias/congelados.png",
+  "Despensa": "/categorias/despensa.png",
+  "Frutería": "/categorias/fruteria.png",
+  "Higiene": "/categorias/higiene.png",
+  "Lácteos": "/categorias/lacteos.png",
+  "Limpieza": "/categorias/limpieza.png",
+  "Panadería": "/categorias/panaderia.png",
+  "Pescadería": "/categorias/pescaderia.png",
+  "Verdura": "/categorias/verdura.png",
 };
 
 export default function Home() {
@@ -221,7 +221,11 @@ export default function Home() {
                 onClick={() => setCategoriaActiva(cat)}
                 className="flex flex-col items-center justify-center bg-zinc-900 border border-zinc-800 rounded-xl p-3 hover:border-emerald-600 hover:bg-zinc-800 transition-colors"
               >
-                <span className="text-3xl mb-1">{CATEGORIA_EMOJIS[cat] ?? "🛒"}</span>
+                {CATEGORIA_ICONOS[cat] ? (
+                  <img src={CATEGORIA_ICONOS[cat]} alt={cat} className="w-16 h-16 object-contain mb-1" />
+                ) : (
+                  <span className="text-3xl mb-1">🛒</span>
+                )}
                 <span className="text-xs text-zinc-300 text-center leading-tight">{cat}</span>
                 <span className="text-xs text-zinc-600 mt-0.5">
                   {products.filter((p) => p.categoria === cat).length}

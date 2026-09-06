@@ -222,7 +222,7 @@ export default function Home() {
                 className="flex flex-col items-center justify-center bg-zinc-900 border border-zinc-800 rounded-xl p-3 hover:border-emerald-600 hover:bg-zinc-800 transition-colors"
               >
                 {CATEGORIA_ICONOS[cat] ? (
-                  <img src={CATEGORIA_ICONOS[cat]} alt={cat} className="w-16 h-16 object-contain mb-1" />
+                  <img src={CATEGORIA_ICONOS[cat]} alt={cat} className="w-20 h-20 object-contain mb-1" />
                 ) : (
                   <span className="text-3xl mb-1">🛒</span>
                 )}

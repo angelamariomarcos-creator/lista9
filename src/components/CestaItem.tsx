@@ -39,34 +39,23 @@ export default function CestaItem({ item, nombreAnadido, onRemove, onToggle }: C
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: item.comprado ? 0.45 : 1, y: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${
-        item.comprado
-          ? "bg-zinc-950 border-zinc-900"
-          : "bg-zinc-900 border-zinc-800"
-      }`}
+      className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${item.comprado ? "bg-zinc-950 border-zinc-900" : "bg-zinc-900 border-zinc-800"}`}
     >
-      <button
-        onClick={() => onToggle(item.id, !item.comprado)}
-        className={`flex-shrink-0 w-6 h-6 rounded-md border flex items-center justify-center transition-colors ${
-          item.comprado
-            ? "bg-emerald-600 border-emerald-600"
-            : "border-zinc-600 hover:border-emerald-500"
-        }`}
-        aria-label="Marcar como comprado"
-      >
-        {item.comprado && <Check size={14} className="text-white" />}
-      </button>
+      <div className="relative group flex-shrink-0">
+        <button onClick={() => onToggle(item.id, !item.comprado)} className={`w-6 h-6 rounded-md border flex items-center justify-center transition-colors ${item.comprado ? "bg-emerald-600 border-emerald-600" : "border-zinc-600 hover:border-emerald-500"}`} aria-label="Marcar como comprado">
+          {item.comprado && <Check size={14} className="text-white" />}
+        </button>
+        <div className="absolute bottom-8 left-0 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs rounded-lg px-3 py-2 w-44 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+          {item.comprado ? "✅ Ya en el carrito — toca para desmarcar" : "☑️ Márcalo cuando lo eches al carrito"}
+        </div>
+      </div>
 
       <span className={`text-2xl ${item.comprado ? "grayscale" : ""}`}>
         {item.products?.emoji ?? "🛒"}
       </span>
 
       <div className="flex-1 min-w-0">
-        <p
-          className={`text-sm font-medium ${
-            item.comprado ? "text-zinc-500 line-through" : "text-white"
-          }`}
-        >
+        <p className={`text-sm font-medium ${item.comprado ? "text-zinc-500 line-through" : "text-white"}`}>
           {item.products?.nombre ?? "Producto"}
         </p>
         {item.comentario_ia && !item.comprado && (
@@ -77,25 +66,34 @@ export default function CestaItem({ item, nombreAnadido, onRemove, onToggle }: C
       </div>
 
       {nombreAnadido && (
-        <div
-          className={`flex-shrink-0 w-6 h-6 rounded-full ${colorParaNombre(nombreAnadido)} flex items-center justify-center text-[10px] font-semibold text-white`}
-          title={`Añadido por ${nombreAnadido}`}
-        >
-          {nombreAnadido.charAt(0).toUpperCase()}
+        <div className="relative group flex-shrink-0">
+          <div className={`w-6 h-6 rounded-full ${colorParaNombre(nombreAnadido)} flex items-center justify-center text-[10px] font-semibold text-white`}>
+            {nombreAnadido.charAt(0).toUpperCase()}
+          </div>
+          <div className="absolute bottom-8 right-0 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs rounded-lg px-3 py-2 w-36 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+            👤 Añadido por {nombreAnadido}
+          </div>
         </div>
       )}
 
-      <a href={`https://www.google.com/search?q=${encodeURIComponent((item.products?.nombre ?? "") + " precio supermercado")}`} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 p-2 rounded-lg text-zinc-500 hover:text-emerald-400 hover:bg-emerald-950/30 transition-colors" aria-label="Buscar precio en Google">
-        <Search size={16} />
-      </a>
+      <div className="relative group flex-shrink-0">
+        <a href={`https://www.google.com/search?q=${encodeURIComponent((item.products?.nombre ?? "") + " precio supermercado")}`} target="_blank" rel="noopener noreferrer" className="flex p-2 rounded-lg text-zinc-500 hover:text-emerald-400 hover:bg-emerald-950/30 transition-colors" aria-label="Buscar precio en Google">
+          <Search size={16} />
+        </a>
+        <div className="absolute bottom-10 right-0 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs rounded-lg px-3 py-2 w-44 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+          🔍 Buscar el precio de {item.products?.nombre ?? "este producto"} en Google
+        </div>
+      </div>
 
-      <button
-        onClick={() => onRemove(item.id)}
-        className="flex-shrink-0 p-2 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-950/30 transition-colors"
-        aria-label="Eliminar"
-      >
-        <Trash2 size={16} />
-      </button>
+      <div className="relative group flex-shrink-0">
+        <button onClick={() => onRemove(item.id)} className="flex p-2 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-950/30 transition-colors" aria-label="Eliminar">
+          <Trash2 size={16} />
+        </button>
+        <div className="absolute bottom-10 right-0 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs rounded-lg px-3 py-2 w-40 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+          🗑️ Quitar este producto de la cesta
+        </div>
+      </div>
+
     </motion.div>
   );
 }

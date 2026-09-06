@@ -120,24 +120,32 @@ export default function GastosPage() {
     <main className="min-h-screen bg-black text-white pb-24 p-4">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <a href="/" className="text-zinc-400 hover:text-white text-xl" aria-label="Volver al inicio">
-            ←
-          </a>
+          <a href="/" className="text-zinc-400 hover:text-white text-xl" aria-label="Volver al inicio">←</a>
           <h1 className="text-xl font-semibold">Gastos del mes</h1>
         </div>
         {tickets.length > 0 && (
-          <button
-            onClick={handleExportarCSV}
-            className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg transition-colors"
-          >
-            Exportar CSV
-          </button>
+          <div className="relative group">
+            <button
+              onClick={handleExportarCSV}
+              className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              Exportar CSV
+            </button>
+            <div className="absolute bottom-10 right-0 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs rounded-lg px-3 py-2 w-56 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+              📊 Descarga todos los gastos del mes en formato Excel/CSV con fecha, producto, categoría y precio
+            </div>
+          </div>
         )}
       </div>
 
-      <a href="/tickets" className="block text-center bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-lg font-medium mb-6">
-        + Añadir ticket
-      </a>
+      <div className="relative group mb-6">
+        <a href="/tickets" className="block text-center bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-lg font-medium">
+          + Añadir ticket
+        </a>
+        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs rounded-lg px-3 py-2 w-60 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl text-center">
+          🧾 Sube un ticket del supermercado — añade los productos y su precio para llevar el control mensual
+        </div>
+      </div>
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-4">
         <p className="text-sm text-zinc-400 mb-1">Total este mes</p>
@@ -150,9 +158,15 @@ export default function GastosPage() {
 
       {Object.keys(porCategoria).length > 0 && (
         <div className="mb-6">
-          <h2 className="text-sm font-medium text-zinc-400 uppercase tracking-wide mb-3">
-            Por categoría
-          </h2>
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="text-sm font-medium text-zinc-400 uppercase tracking-wide">Por categoría</h2>
+            <div className="relative group">
+              <span className="text-xs text-zinc-600 cursor-help">(?)</span>
+              <div className="absolute bottom-6 left-0 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs rounded-lg px-3 py-2 w-56 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+                📊 Desglose de cuánto has gastado en cada sección del supermercado este mes
+              </div>
+            </div>
+          </div>
           <div className="space-y-2">
             {Object.entries(porCategoria)
               .sort((a, b) => b[1] - a[1])
@@ -163,10 +177,7 @@ export default function GastosPage() {
                     <span className="text-zinc-400">{importe.toFixed(2)} €</span>
                   </div>
                   <div className="w-full bg-zinc-800 rounded-full h-2">
-                    <div
-                      className="bg-emerald-500 h-2 rounded-full"
-                      style={{ width: `${(importe / maxCategoria) * 100}%` }}
-                    />
+                    <div className="bg-emerald-500 h-2 rounded-full" style={{ width: `${(importe / maxCategoria) * 100}%` }} />
                   </div>
                 </div>
               ))}
@@ -174,23 +185,14 @@ export default function GastosPage() {
         </div>
       )}
 
-      <h2 className="text-sm font-medium text-zinc-400 uppercase tracking-wide mb-3">
-        Tickets del mes
-      </h2>
+      <h2 className="text-sm font-medium text-zinc-400 uppercase tracking-wide mb-3">Tickets del mes</h2>
       <div className="space-y-2">
         {tickets.length === 0 && (
-          <p className="text-zinc-500 text-sm text-center mt-6">
-            No hay tickets este mes todavía.
-          </p>
+          <p className="text-zinc-500 text-sm text-center mt-6">No hay tickets este mes todavía.</p>
         )}
         {tickets.map((ticket) => (
-          <div
-            key={ticket.id}
-            className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-lg p-3"
-          >
-            <span className="text-sm text-zinc-400">
-              {new Date(ticket.creado_en).toLocaleDateString("es-ES")}
-            </span>
+          <div key={ticket.id} className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-lg p-3">
+            <span className="text-sm text-zinc-400">{new Date(ticket.creado_en).toLocaleDateString("es-ES")}</span>
             <span className="font-medium">{Number(ticket.total).toFixed(2)} €</span>
           </div>
         ))}

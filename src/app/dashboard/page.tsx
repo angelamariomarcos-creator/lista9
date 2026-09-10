@@ -1,4 +1,4 @@
-import SeniorRexBanner from '@/components/SeniorRexBanner';
+﻿import SeniorRexBanner from '@/components/SeniorRexBanner';
 
 export const metadata = {
   title: 'Senior Rex Analytics — Lista9',
@@ -11,7 +11,7 @@ export default function DashboardPage() {
 
       <h1 className="text-3xl font-bold mb-2">🦖 Senior Rex Analytics</h1>
       <p className="text-gray-500 mb-8">
-        El cuadro de mandos de la Familia Marcos — gasto, ranking y predicciones.
+        El cuadro de mandos de la Familia García — gasto, ranking y predicciones.
       </p>
 
       {/* TODO: gráfico gasto mensual por semana (Recharts) */}
@@ -48,3 +48,5 @@ export default function DashboardPage() {
     </main>
   );
 }
+
+

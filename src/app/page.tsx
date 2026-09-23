@@ -11,6 +11,7 @@ import SeniorRexBanner from "@/components/SeniorRexBanner";
 import CestaEnVivoCard from "@/components/CestaEnVivoCard";
 import GastoSemanalCard from "@/components/GastoSemanalCard";
 import ProductosMasCompradosCard from "@/components/ProductosMasCompradosCard";
+import RankingFamiliarCard from "@/components/RankingFamiliarCard";
 
 type Product = {
   id: string;
@@ -267,11 +268,7 @@ export default function Home() {
               <CestaEnVivoCard />
               <GastoSemanalCard />
               <ProductosMasCompradosCard />
-
-              <section className="bg-white rounded-2xl shadow-sm p-6">
-                <h3 className="text-lg font-semibold mb-2 text-zinc-900">Ranking familiar</h3>
-                <p className="text-gray-400 text-sm">Próximamente — quién añade más a la cesta</p>
-              </section>
+              <RankingFamiliarCard />
 
               <section className="bg-white rounded-2xl shadow-sm p-6">
                 <h3 className="text-lg font-semibold mb-2 text-zinc-900">Predicción del próximo mes</h3>

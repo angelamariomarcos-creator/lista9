@@ -47,6 +47,7 @@ export default function Home() {
   const [despensaRowIds, setDespensaRowIds] = useState<Record<string, string>>({});
   const [despensaEstados, setDespensaEstados] = useState<Record<string, string>>({});
   const [fraseIronica, setFraseIronica] = useState<string>("");
+  const [toastFrase, setToastFrase] = useState<string>("");
   useEffect(() => {
     if (pathname === "/") {
       elegirFraseIronicaHome().then(setFraseIronica);
@@ -116,6 +117,8 @@ export default function Home() {
     setAddingId(product.id);
     const supabase = createClient();
     const frase = await elegirFraseSinRepetir(product.id);
+    setToastFrase(frase);
+    setTimeout(() => setToastFrase(""), 3000);
     const { data: userData } = await supabase.auth.getUser();
 
     await supabase.from("cesta").insert({
@@ -198,6 +201,12 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white pb-24">
       <SeniorRexReaction trigger={rexTrigger} type="yes" />
+
+      {toastFrase && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-xs text-center rounded-lg border border-emerald-900 bg-emerald-950/90 px-4 py-2 text-sm text-emerald-200 shadow-xl">
+          🦖 {toastFrase}
+        </div>
+      )}
 
       <div className="sticky top-0 z-10 bg-black border-b border-zinc-800 p-4">
         <div className="flex items-center justify-between mb-3">
@@ -308,6 +317,7 @@ export default function Home() {
     </main>
   );
 }
+
 
 
 

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 export default function SeniorRexBanner() {
   return (
@@ -9,7 +9,7 @@ export default function SeniorRexBanner() {
         loop
         muted
         playsInline
-        className="w-full h-auto max-h-[280px] object-cover mx-auto transition-transform duration-300 group-hover:scale-105"
+        className="w-full h-auto max-h-[160px] object-cover mx-auto transition-transform duration-300 group-hover:scale-105"
       />
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-3 py-1 rounded-full">
         🦖 Senior Rex currando duro

@@ -42,3 +42,23 @@ export async function elegirFraseSinRepetir(productId: string): Promise<string> 
   const elegida = disponibles[Math.floor(Math.random() * disponibles.length)];
   return elegida;
 }
+
+/**
+ * Elige una frase de humor aleatoria del banco general para mostrar
+ * como saludo irónico en la home, sin atarla a ningún producto.
+ */
+export async function elegirFraseIronicaHome(): Promise<string> {
+  const supabase = createClient();
+
+  const { data: todasLasFrases } = await supabase
+    .from("frases_humor")
+    .select("texto");
+
+  const banco = (todasLasFrases ?? []).map((f) => f.texto as string);
+
+  if (banco.length === 0) {
+    return "Senior Rex se ha quedado sin frases, recarga el banco.";
+  }
+
+  return banco[Math.floor(Math.random() * banco.length)];
+}

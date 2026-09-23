@@ -1,11 +1,16 @@
 ﻿"use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import { elegirFraseSinRepetir } from "@/lib/frases";
+import { elegirFraseSinRepetir, elegirFraseIronicaHome } from "@/lib/frases";
 import ProductCard from "@/components/ProductCard";
 import SeniorRexReaction from "@/components/SeniorRexReaction";
 import PrediccionRex from "@/components/PrediccionRex";
+import SeniorRexBanner from "@/components/SeniorRexBanner";
+import CestaEnVivoCard from "@/components/CestaEnVivoCard";
+import GastoSemanalCard from "@/components/GastoSemanalCard";
+import ProductosMasCompradosCard from "@/components/ProductosMasCompradosCard";
 
 type Product = {
   id: string;
@@ -30,6 +35,7 @@ const CATEGORIA_ICONOS: Record<string, string> = {
 };
 
 export default function Home() {
+  const pathname = usePathname();
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -40,9 +46,16 @@ export default function Home() {
   const [despensaIds, setDespensaIds] = useState<Set<string>>(new Set());
   const [despensaRowIds, setDespensaRowIds] = useState<Record<string, string>>({});
   const [despensaEstados, setDespensaEstados] = useState<Record<string, string>>({});
+  const [fraseIronica, setFraseIronica] = useState<string>("");
+  useEffect(() => {
+    if (pathname === "/") {
+      elegirFraseIronicaHome().then(setFraseIronica);
+    }
+  }, [pathname]);
 
   useEffect(() => {
     const supabase = createClient();
+    elegirFraseIronicaHome().then(setFraseIronica);
 
     async function loadProducts() {
       const { data, error } = await supabase
@@ -213,25 +226,49 @@ export default function Home() {
 
       {!categoriaActiva && !search && (
         <div className="p-4">
-          <p className="text-xs text-zinc-500 uppercase tracking-wide mb-3">Categorías</p>
-          <div className="grid grid-cols-3 gap-3">
+          <SeniorRexBanner />
+
+          {fraseIronica && (
+            <div className="mt-4 mb-2 flex items-start gap-2 rounded-lg border border-emerald-900 bg-emerald-950/40 px-3 py-2 text-sm text-emerald-200">
+              <span>🦖</span>
+              <span>{fraseIronica}</span>
+            </div>
+          )}
+
+          <p className="text-xs text-zinc-500 uppercase tracking-wide mb-3 mt-4">Categorías</p>
+          <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
             {categorias.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategoriaActiva(cat)}
-                className="flex flex-col items-center justify-center bg-zinc-900 border border-zinc-800 rounded-xl p-3 hover:border-emerald-600 hover:bg-zinc-800 transition-colors"
+                className="flex-shrink-0 px-4 py-2.5 rounded-full bg-zinc-900 border border-zinc-800 hover:border-emerald-600 hover:bg-zinc-800 transition-colors"
               >
-                {CATEGORIA_ICONOS[cat] ? (
-                  <img src={CATEGORIA_ICONOS[cat]} alt={cat} className="w-20 h-20 object-contain mb-1" />
-                ) : (
-                  <span className="text-3xl mb-1">🛒</span>
-                )}
-                <span className="text-xs text-zinc-300 text-center leading-tight">{cat}</span>
-                <span className="text-xs text-zinc-600 mt-0.5">
-                  {products.filter((p) => p.categoria === cat).length}
+                <span className="font-brand font-semibold text-sm tracking-wide text-zinc-200 whitespace-nowrap">
+                  {cat}
                 </span>
               </button>
             ))}
+          </div>
+
+          <div className="mt-8">
+            <h2 className="font-brand text-2xl font-bold mb-1 text-white uppercase">La Lista 9.0</h2>
+            <p className="text-zinc-500 mb-6 text-sm">La compra semanal más fácil</p>
+
+            <div className="flex flex-col gap-4">
+              <CestaEnVivoCard />
+              <GastoSemanalCard />
+              <ProductosMasCompradosCard />
+
+              <section className="bg-white rounded-2xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold mb-2 text-zinc-900">Ranking familiar</h3>
+                <p className="text-gray-400 text-sm">Próximamente — quién añade más a la cesta</p>
+              </section>
+
+              <section className="bg-white rounded-2xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold mb-2 text-zinc-900">Predicción del próximo mes</h3>
+                <p className="text-gray-400 text-sm">Próximamente — predicción + comentario de Senior Rex</p>
+              </section>
+            </div>
           </div>
         </div>
       )}
@@ -271,3 +308,11 @@ export default function Home() {
     </main>
   );
 }
+
+
+
+
+
+
+
+

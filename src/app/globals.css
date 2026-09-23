@@ -1,3 +1,4 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -66,3 +67,7 @@ body {
     transform: translateX(0);
   }
 }
+.font-brand { font-family: 'Baloo 2', sans-serif; }
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

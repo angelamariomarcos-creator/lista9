@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { usePathname } from "next/navigation";
-import { ShoppingCart, Receipt, User, LogOut, BarChart3 } from "lucide-react";
+import { ShoppingCart, Receipt, User, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 
@@ -41,14 +41,6 @@ export default function TopNav() {
           </div>
         </a>
 
-        <a href="/dashboard" className={`relative group flex flex-col items-center px-3 py-1 rounded-lg transition-colors ${pathname === "/dashboard" ? "text-emerald-400" : "text-zinc-500 hover:text-white"}`}>
-          <BarChart3 size={20} />
-          <span className="text-[9px] mt-0.5">Dashboard</span>
-          <div className="absolute top-10 right-0 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs rounded-lg px-3 py-2 w-52 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
-            📊 Gasto, ranking y predicciones de la familia
-          </div>
-        </a>
-
         <a href="/gastos" className={`relative group flex flex-col items-center px-3 py-1 rounded-lg transition-colors ${pathname === "/gastos" ? "text-emerald-400" : "text-zinc-500 hover:text-white"}`}>
           <Receipt size={20} />
           <span className="text-[9px] mt-0.5">Gastos</span>
@@ -79,5 +71,6 @@ export default function TopNav() {
     </header>
   );
 }
+
 
 
